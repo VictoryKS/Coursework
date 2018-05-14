@@ -5,7 +5,7 @@ function Queue(userName) {
   this.first = null;
   this.last = null;
   this.length = 0;
-  this.time;
+  this.time = 0;
 }
 
 Queue.prototype.timeout = function(time) {
@@ -69,6 +69,7 @@ Queue.prototype.drain = function() {
   this.first = null;
   this.last = null;
   this.length = 0;
+  this.time = 0;
 };
 
 function QueuingSystem() {
