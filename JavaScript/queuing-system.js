@@ -5,11 +5,11 @@ function Queue(userName) {
   this.first = null;
   this.last = null;
   this.length = 0;
-  this.time = 0;
+  this.timeout = 0;
 }
 
-Queue.prototype.timeout = function(time) {
-  this.time = time;
+Queue.prototype.setTimeout = function(msec) {
+  this.timeout = msec;
   return this;
 };
 
@@ -35,18 +35,18 @@ Queue.prototype.add = function(item, priority) {
     }
   }
   this.length++;
-  if (this.time) {
+  if (this.timeout) {
     setTimeout(() => {
-      if (this.length <= 1) {
-        this.first = null;
-        this.last = null;
-        this.length = 0;
-      } else {
+      if (this.length > 1) {
         this.last = element.prev;
         element = null;
         this.length--;
+      } else {
+        this.first = null;
+        this.last = null;
+        this.length = 0;
       }
-    }, this.time);
+    }, this.timeout);
   }
   return this;
 };
@@ -77,15 +77,12 @@ function QueuingSystem() {
 }
 
 QueuingSystem.prototype.logIn = function(userName) {
-  let contains = false;
   this.queues.forEach(q => {
-    if (q.userName === userName) contains = true;
+    if (q.userName === userName) return null;
   });
-  if (!contains) {
-    const list = new Queue(userName);
-    this.queues.push(list);
-    return list;
-  }
+  const list = new Queue(userName);
+  this.queues.push(list);
+  return list;
 };
 
 QueuingSystem.prototype.logOff = function(userName) {
@@ -93,6 +90,7 @@ QueuingSystem.prototype.logOff = function(userName) {
   for (let i = 0; i < q.length; i++) {
     if (q[i].userName === userName) {
       q.splice(i, 1);
+      return;
     }
   }
 };
