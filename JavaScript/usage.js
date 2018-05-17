@@ -12,7 +12,7 @@ const obj1 = { number: 'first' };
 const obj2 = { number: 'second' };
 const obj3 = { number: 'third' };
 
-User1.timeout(3000)
+User1.setTimeout(3000)
      .add(obj1, 7)
      .add(obj2, 9)
      .add(obj3, 3);
