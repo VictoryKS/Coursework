@@ -2,38 +2,38 @@
 
 const QueuingSystem = require('./queuing-system.js');
 
-const q = new QueuingSystem();
+const qsys = new QueuingSystem();
 
-const User1 = q.logIn('John');
-const User2 = q.logIn('Tom');
-const User3 = q.logIn('John');
+const user1 = qsys.logIn('John');
+const user2 = qsys.logIn('Tom');
+const user3 = qsys.logIn('John');
 
 const obj1 = { number: 'first' };
 const obj2 = { number: 'second' };
 const obj3 = { number: 'third' };
 
-User1.setTimeout(3000)
-     .add(obj1, 7)
-     .add(obj2, 9)
-     .add(obj3, 3);
+user1.setTimeout(3000)
+  .add(obj1, 7)
+  .add(obj2, 9)
+  .add(obj3, 3);
 
-User2.add(obj1, 5);
+user2.add(obj1, 5);
 
-q.process(item => {
+qsys.process(item => {
   console.log(item.shift());
 });
 
 console.log('///////////////');
 
-q.process(item => {
+qsys.process(item => {
   console.log(item.shift());
 });
 
-q.logOff('Tom');
+qsys.logOff('Tom');
 console.log('///////////////');
 
 setTimeout(() => {
-  q.process((item) => {
+  qsys.process((item) => {
     console.log(item);
   });
 }, 4000);

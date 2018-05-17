@@ -13,33 +13,37 @@ Queue.prototype.setTimeout = function(msec) {
   return this;
 };
 
+const prioritization = function(queue, element) {
+  let current = queue.last;
+  for (let i = 1; i < queue.length; i++) {
+    if (current.priority <= element.priority) current = current.prev;
+  }
+  if (!current.prev && current.priority < element.priority) {
+    element.next = queue.first;
+    queue.first.prev = element;
+    queue.first = element;
+  } else if (current.priority >= element.priority) {
+    element.next = current.next;
+    current.next = element;
+    element.prev = current;
+    if (!element.next) queue.last = element;
+  }
+}
+
 Queue.prototype.add = function(item, priority) {
-  let element = { prev: null, next: null, item, priority };
+  const element = { prev: null, next: null, item, priority };
   if (!this.last) {
     this.first = element;
     this.last = element;
   } else {
-    let current = this.last;
-    for (let i = 1; i < this.length; i++) {
-      if (current.priority <= element.priority) current = current.prev;
-    }
-    if (!current.prev && current.priority < element.priority) {
-      element.next = this.first;
-      this.first.prev = element;
-      this.first = element;
-    } else if (current.priority >= element.priority) {
-      element.next = current.next;
-      current.next = element;
-      element.prev = current;
-      if (!element.next) this.last = element;
-    }
+    prioritization(this, element);
   }
   this.length++;
   if (this.timeout) {
     setTimeout(() => {
       if (this.length > 1) {
-        this.last = element.prev;
-        element = null;
+        this.last = this.last.prev;
+        this.last.next = null;
         this.length--;
       } else {
         this.first = null;
@@ -69,7 +73,7 @@ Queue.prototype.drain = function() {
   this.first = null;
   this.last = null;
   this.length = 0;
-  this.time = 0;
+  this.timeout = 0;
 };
 
 function QueuingSystem() {
@@ -77,19 +81,20 @@ function QueuingSystem() {
 }
 
 QueuingSystem.prototype.logIn = function(userName) {
-  this.queues.forEach(q => {
-    if (q.userName === userName) return null;
-  });
+  const queues = this.queues;
+  for (let i = 0; i < queues.length; i++) {
+    if (queues[i].userName === userName) return null;
+  }
   const list = new Queue(userName);
-  this.queues.push(list);
+  queues.push(list);
   return list;
 };
 
 QueuingSystem.prototype.logOff = function(userName) {
-  const q = this.queues;
-  for (let i = 0; i < q.length; i++) {
-    if (q[i].userName === userName) {
-      q.splice(i, 1);
+  const queues = this.queues;
+  for (let i = 0; i < queues.length; i++) {
+    if (queues[i].userName === userName) {
+      queues.splice(i, 1);
       return;
     }
   }
